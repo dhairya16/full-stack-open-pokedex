@@ -37,3 +37,18 @@ jobs:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
           apiKey: ${{ secrets.RENDER_API_KEY }}
           multipleDeployment: false #optional, default true
+
+  tag_release:
+    needs: [simple_deployment_pipeline] # wait for pipeline
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' # only push to main
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0' # needed for tags
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.75.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch # ensures patch bump
+          # DRY_RUN: true       # Uncomment to test without tagging
