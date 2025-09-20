@@ -11,6 +11,7 @@ on:
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' '), '#skip')
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -41,7 +42,7 @@ jobs:
   tag_release:
     needs: [simple_deployment_pipeline] # wait for pipeline
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' # only push to main
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(join(github.event.commits.*.message, ' '), '#skip')
     steps:
       - uses: actions/checkout@v4
         with:
